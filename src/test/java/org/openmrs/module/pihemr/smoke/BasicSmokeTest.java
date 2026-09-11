@@ -18,6 +18,7 @@ import org.openmrs.module.pihemr.smoke.pageobjects.HeaderPage;
 import org.openmrs.module.pihemr.smoke.pageobjects.loginpages.LoginPage;
 import org.openmrs.module.pihemr.smoke.pageobjects.loginpages.ZlCentralLoginPage;
 import org.openmrs.module.pihemr.smoke.pageobjects.VisitNote;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
@@ -95,6 +96,9 @@ public abstract class BasicSmokeTest {
 
 	@Before
     public void initPageObjects() {
+        // clear any stale alerts from previous test
+        dismissAlertIfPresent();
+
         header = new HeaderPage(driver);
         loginPage = getLoginPage();
         visitNote = new VisitNote(driver);
@@ -107,8 +111,19 @@ public abstract class BasicSmokeTest {
 
     @After
     public void teardown() throws Exception {
+        // clear any stale alers
+        dismissAlertIfPresent();
         turnOnImplicitWait();
         logout();
+    }
+
+    protected static void dismissAlertIfPresent() {
+        try {
+            driver.switchTo().alert().dismiss();
+        }
+        catch (NoAlertPresentException e) {
+            // no-op, nothing to clean up
+        }
     }
 
     @AfterClass
