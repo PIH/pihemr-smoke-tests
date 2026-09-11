@@ -109,6 +109,8 @@ public class UserDatabaseHandler extends BaseDatabaseHandler {
 		resetColumnThatMatchesUserId("users", "creator" ,userId);
 		resetColumnThatMatchesUserId("users", "changed_by" ,userId);
 		resetColumnThatMatchesUserId("idgen_identifier_source", "changed_by", userId);
+		resetColumnThatMatchesUserId("htmlformentry_html_form", "creator", userId);
+		resetColumnThatMatchesUserId("htmlformentry_html_form", "changed_by", userId);
 
 		userDataToDelete.addTable("users", "select * from users where user_id = " + userId);
         // added after "users" -- DatabaseOperation.DELETE processes tables in reverse of
