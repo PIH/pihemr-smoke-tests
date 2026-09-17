@@ -6,7 +6,9 @@ import org.openmrs.module.pihemr.smoke.helper.SmokeTestProperties;
 import org.openmrs.module.pihemr.smoke.helper.UserDatabaseHandler;
 import org.openmrs.module.pihemr.smoke.pageobjects.TermsAndConditionsPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -34,8 +36,11 @@ public abstract class LoginPage {
 		selectFacilityIfNeeded();
 		location = (StringUtils.isBlank(location) ? getDefaultLocationName() : location);
 		By locationOption = By.xpath("//*[contains(text(), '" + location + "')]");
-		wait30seconds.until(ExpectedConditions.elementToBeClickable(locationOption));
-		driver.findElement(locationOption).click();
+		// native .click() isn't always reliably registered by Selenium/Chrome (see AbstractPageObject.clickOn()
+		// for the same issue elsewhere in this codebase); use a JS-executed click on the exact element the
+		// wait already confirmed clickable, rather than re-querying and native-clicking a second lookup
+		WebElement locationElement = wait30seconds.until(ExpectedConditions.elementToBeClickable(locationOption));
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", locationElement);
 	}
 
 	// some servers show a facility-selection step (a "visit-location-select" list) that must be
