@@ -19,6 +19,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfEl
 public class CheckInFormPage extends AbstractPageObject {
 
 	private static final String CONFIRM_TEXT = "Konfime";
+	private static final String DETAILS_TEXT = "Detay";
+	private static final String TYPE_OF_VISIT_TEXT = "Tip de Vizit";
 
     public static final By SEARCH_FIELD = By.id("patient-search");
 
@@ -35,6 +37,7 @@ public class CheckInFormPage extends AbstractPageObject {
         // TODO: potential fix below when we switch to the new type of visit selector in Mirebalais
         //clickOn(By.cssSelector(".section-container > :last-child"));
         //hitEnterKey();
+        tabThroughDetailsToTypeOfVisit();
         selectThirdOptionFor("typeOfVisit");
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
@@ -44,6 +47,7 @@ public class CheckInFormPage extends AbstractPageObject {
     }
 
     public void enterInfoWithMultipleEnterKeystrokesOnSubmit()  {
+        tabThroughDetailsToTypeOfVisit();
         selectThirdOptionFor("typeOfVisit");
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
@@ -69,11 +73,13 @@ public class CheckInFormPage extends AbstractPageObject {
     }
 
 	public void enterInfoFillingTheFormTwice() throws Exception {
+        tabThroughDetailsToTypeOfVisit();
         selectThirdOptionFor("typeOfVisit");
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
         clickOnNoButton();
+        tabThroughDetailsToTypeOfVisit();
         selectSecondOptionFor("typeOfVisit");
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
@@ -106,12 +112,31 @@ public class CheckInFormPage extends AbstractPageObject {
 	}
 
 	private void clickOnConfirmationTab() {
+		clickOnBreadcrumbTab(CONFIRM_TEXT);
+	}
+
+	private void clickOnDetailsTab() {
+		clickOnBreadcrumbTab(DETAILS_TEXT);
+	}
+
+	private void clickOnTypeOfVisitTab() {
+		clickOnBreadcrumbTab(TYPE_OF_VISIT_TEXT);
+	}
+
+	private void clickOnBreadcrumbTab(String tabText) {
 		List<WebElement> elements = driver.findElements(By.cssSelector("#formBreadcrumb span"));
 		for (WebElement element : elements) {
-	        if(element.getText().contains(CONFIRM_TEXT)) {
+	        if(element.getText().contains(tabText)) {
 	        	element.click();
 	        }
 	    }
+	}
+
+	// the "Tcheke" wizard starts on its first step (Detay); tab through it explicitly before
+	// interacting with Tip de Vizit rather than assuming it's the step already showing
+	private void tabThroughDetailsToTypeOfVisit() {
+		clickOnDetailsTab();
+		clickOnTypeOfVisitTab();
 	}
 
     // TODO: revert https://github.com/PIH/mirebalais-smoke-tests/commit/e9ab41b02f4c263362b3627cd9e9b3cde951bd4f
