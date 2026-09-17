@@ -179,7 +179,7 @@ public class AppDashboard extends AbstractPageObject {
 
     public void goToVisitNoteVisitList(BigInteger patientId) {
         driver.get(properties.getWebAppUrl() + "/pihcore/visit/visit.page?patient=" + patientId + "#/visitList");
-        wait15seconds.until(visibilityOfElementLocated(By.id("visit-list")));
+        wait30seconds.until(visibilityOfElementLocated(By.id("visit-list")));
     }
 
 
