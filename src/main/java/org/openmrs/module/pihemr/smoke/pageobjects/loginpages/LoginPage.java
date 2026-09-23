@@ -7,6 +7,7 @@ import org.openmrs.module.pihemr.smoke.helper.UserDatabaseHandler;
 import org.openmrs.module.pihemr.smoke.pageobjects.TermsAndConditionsPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,11 +36,23 @@ public abstract class LoginPage {
 		termsAndConditionsPage.acceptTermsIfPresent();
 		selectFacilityIfNeeded();
 		location = (StringUtils.isBlank(location) ? getDefaultLocationName() : location);
-		By locationOption = By.xpath("//*[contains(text(), '" + location + "')]");
+		// scoped to the actual location list items (contains(., ...) matches the element's full text
+		// content, not just a direct text-node child) rather than a bare //*[contains(text(), ...)]
+		// search of the whole DOM, which can also match unrelated static text (e.g. a page heading
+		// showing the same location name) elsewhere on the page
+		By locationOption = By.xpath("//li[contains(@class, 'location-list-item') and contains(., '" + location + "')]");
+		WebElement locationElement;
+		try {
+			locationElement = wait30seconds.until(ExpectedConditions.elementToBeClickable(locationOption));
+		}
+		catch (TimeoutException e) {
+			// hack: retry once -- the location list occasionally isn't ready in time on first load
+			driver.navigate().refresh();
+			locationElement = wait30seconds.until(ExpectedConditions.elementToBeClickable(locationOption));
+		}
 		// native .click() isn't always reliably registered by Selenium/Chrome (see AbstractPageObject.clickOn()
 		// for the same issue elsewhere in this codebase); use a JS-executed click on the exact element the
 		// wait already confirmed clickable, rather than re-querying and native-clicking a second lookup
-		WebElement locationElement = wait30seconds.until(ExpectedConditions.elementToBeClickable(locationOption));
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", locationElement);
 	}
 
