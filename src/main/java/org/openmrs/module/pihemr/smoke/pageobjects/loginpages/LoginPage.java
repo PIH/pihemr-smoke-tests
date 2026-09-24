@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.module.pihemr.smoke.dataModel.User;
 import org.openmrs.module.pihemr.smoke.helper.SmokeTestProperties;
 import org.openmrs.module.pihemr.smoke.helper.UserDatabaseHandler;
+import org.openmrs.module.pihemr.smoke.pageobjects.HeaderPage;
 import org.openmrs.module.pihemr.smoke.pageobjects.TermsAndConditionsPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -29,9 +30,10 @@ public abstract class LoginPage {
 	}
 
 	public void logIn(String user, String password, String location) {
+		ensureOnLoginPage();
 		driver.findElement(By.id("username")).sendKeys(user);
-		driver.findElement(By.id("password")).sendKeys(password);
-		driver.findElement(By.id("login-button")).click();
+		wait30seconds.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))).sendKeys(password);
+		wait30seconds.until(ExpectedConditions.elementToBeClickable(By.id("login-button"))).click();
 		secretQuestionLoginPage.enterSecretQuestion(password);
 		termsAndConditionsPage.acceptTermsIfPresent();
 		selectFacilityIfNeeded();
@@ -54,6 +56,21 @@ public abstract class LoginPage {
 		// for the same issue elsewhere in this codebase); use a JS-executed click on the exact element the
 		// wait already confirmed clickable, rather than re-querying and native-clicking a second lookup
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", locationElement);
+	}
+
+	// the login form is normally reached via the logout redirect, which can be slow on a loaded CI runner
+	// (longer than the implicit wait); if it still hasn't appeared (e.g. logout didn't take and we're sitting
+	// on some other page), log out again -- which redirects to the login page -- and retry once
+	private void ensureOnLoginPage() {
+		By usernameField = By.id("username");
+		try {
+			wait30seconds.until(ExpectedConditions.visibilityOfElementLocated(usernameField));
+		}
+		catch (TimeoutException e) {
+			System.out.println("Login form not found (current url: " + driver.getCurrentUrl() + "), logging out and retrying");
+			new HeaderPage(driver).logOut();
+			wait30seconds.until(ExpectedConditions.visibilityOfElementLocated(usernameField));
+		}
 	}
 
 	// some servers show a facility-selection step (a "visit-location-select" list) that must be

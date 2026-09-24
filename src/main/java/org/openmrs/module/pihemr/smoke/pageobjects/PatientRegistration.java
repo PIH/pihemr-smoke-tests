@@ -215,32 +215,36 @@ public class PatientRegistration extends AbstractPageObject {
 
         // Some forms have additional address fields that need to be filled out or skipped
         driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        Thread.sleep(2000); // hack delay to allow address fields time to get disabled
-        if (driver.findElements(By.name("address1")).size() > 0 && driver.findElement(By.name("address1")).isEnabled() && driver.findElement(By.name("address1")).isDisplayed()) {
-            enterAddressField(By.name("address1"), "123 Main St");
+        try {
+            Thread.sleep(2000); // hack delay to allow address fields time to get disabled
+            if (driver.findElements(By.name("address1")).size() > 0 && driver.findElement(By.name("address1")).isEnabled() && driver.findElement(By.name("address1")).isDisplayed()) {
+                enterAddressField(By.name("address1"), "123 Main St");
+            }
+            if (driver.findElements(By.name("cityVillage")).size() > 0 && driver.findElement(By.name("cityVillage")).isEnabled() && driver.findElement(By.name("cityVillage")).isDisplayed()) {
+                hitTabKey(By.name("cityVillage"));
+            }
+            if (driver.findElements(By.name("address2")).size() > 0 && driver.findElement(By.name("address2")).isEnabled() && driver.findElement(By.name("address2")).isDisplayed()) {
+                enterAddressField(By.name("address2"), "123 Main St");
+            }
+            if (driver.findElements(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).isDisplayed()) {
+                hitTabKey(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2"));
+            }
+            if (driver.findElements(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).isDisplayed()) {
+                enterAddressField(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2"), "");
+            }
+            if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).isDisplayed()) {
+                enterAddressField(By.name("obsgroup.PIH:14704.obs.PIH:Address1"), "");
+            }
+            if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).isDisplayed()) {
+                hitTabKey(By.name("obsgroup.PIH:14704.obs.PIH:City Village"));
+            }
+            if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).isDisplayed()) {
+                enterAddressField(By.name("obsgroup.PIH:14704.obs.PIH:Address2"), "");
+            }
         }
-        if (driver.findElements(By.name("cityVillage")).size() > 0 && driver.findElement(By.name("cityVillage")).isEnabled() && driver.findElement(By.name("cityVillage")).isDisplayed()) {
-            hitTabKey(By.name("cityVillage"));
+        finally {
+            driver.manage().timeouts().implicitlyWait(SmokeTestProperties.IMPLICIT_WAIT_TIME, SECONDS);
         }
-        if (driver.findElements(By.name("address2")).size() > 0 && driver.findElement(By.name("address2")).isEnabled() && driver.findElement(By.name("address2")).isDisplayed()) {
-            enterAddressField(By.name("address2"), "123 Main St");
-        }
-        if (driver.findElements(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2")).isDisplayed()) {
-            hitTabKey(By.name("obsgroup.PIH:Birthplace address construct.obs.PIH:Address2"));
-        }
-        if (driver.findElements(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2")).isDisplayed()) {
-            enterAddressField(By.name("obsgroup.PIH:PATIENT CONTACTS CONSTRUCT.obs.PIH:Address2"), "");
-        }
-        if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address1")).isDisplayed()) {
-            enterAddressField(By.name("obsgroup.PIH:14704.obs.PIH:Address1"), "");
-        }
-        if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:City Village")).isDisplayed()) {
-            hitTabKey(By.name("obsgroup.PIH:14704.obs.PIH:City Village"));
-        }
-        if (driver.findElements(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).size() > 0 && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).isEnabled() && driver.findElement(By.name("obsgroup.PIH:14704.obs.PIH:Address2")).isDisplayed()) {
-            enterAddressField(By.name("obsgroup.PIH:14704.obs.PIH:Address2"), "");
-        }
-        driver.manage().timeouts().implicitlyWait(SmokeTestProperties.IMPLICIT_WAIT_TIME, SECONDS);
     }
 
     public void enterAddressField(By elementId, String text) {

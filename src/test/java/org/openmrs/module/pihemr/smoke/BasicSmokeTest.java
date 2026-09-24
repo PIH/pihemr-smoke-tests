@@ -1,7 +1,6 @@
 package org.openmrs.module.pihemr.smoke;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,6 +48,8 @@ public abstract class BasicSmokeTest {
 
 		private long startTime;
 
+		private boolean testFailed;
+
 		private String testName(Description test) {
 			return test.getTestClass().getSimpleName() + "." + test.getMethodName();
 		}
@@ -56,6 +57,7 @@ public abstract class BasicSmokeTest {
 		@Override
 		protected void starting(Description test) {
 			startTime = System.currentTimeMillis();
+			testFailed = false;
 			System.out.println("===== " + new Date() + " STARTING " + testName(test) + " =====");
 		}
 
@@ -66,6 +68,7 @@ public abstract class BasicSmokeTest {
 
 		@Override
 		public void failed(Throwable t, Description test) {
+			testFailed = true;
 			System.out.println("===== " + new Date() + " FAILED " + testName(test) + " (" + (System.currentTimeMillis() - startTime) + "ms): " + t + " =====");
 
 			// best-effort screenshot only -- must never mask the real failure (t) with a screenshot-capture problem
@@ -75,6 +78,31 @@ public abstract class BasicSmokeTest {
 			}
 			catch (Exception e) {
 				System.out.println("Failed to capture screenshot for " + test.getDisplayName() + ": " + e);
+			}
+
+			// likewise best-effort: record where the browser actually was, to help diagnose transient failures
+			try {
+				System.out.println("Page at failure: url=" + driver.getCurrentUrl() + ", title=" + driver.getTitle());
+				FileUtils.writeStringToFile(new File("screenshots/" + test.getDisplayName() + ".html"), driver.getPageSource(), "UTF-8");
+			}
+			catch (Exception e) {
+				System.out.println("Failed to capture page source for " + test.getDisplayName() + ": " + e);
+			}
+		}
+
+		// teardown runs here rather than in an @After method: rules wrap @After, so an @After logout would
+		// run *before* failed() and the screenshot/page capture would always show the login page
+		@Override
+		protected void finished(Description test) {
+			try {
+				teardown();
+			}
+			catch (Exception e) {
+				// never mask the real failure with a teardown problem (this runs in a finally block)
+				if (!testFailed) {
+					throw new RuntimeException("teardown failed", e);
+				}
+				System.out.println("Teardown also failed for " + testName(test) + ": " + e);
 			}
 		}
 	};
@@ -98,6 +126,8 @@ public abstract class BasicSmokeTest {
     public void initPageObjects() {
         // clear any stale alerts from previous test
         dismissAlertIfPresent();
+        // start each test from a known implicit-wait state, in case a previous test left it turned off
+        turnOnImplicitWait();
 
         header = new HeaderPage(driver);
         loginPage = getLoginPage();
@@ -109,7 +139,7 @@ public abstract class BasicSmokeTest {
     // defaults to Haiti Multi Location Login (ie Mirebalais, Thomonde), must be specifically overridden by other tests
     protected LoginPage getLoginPage() { return new ZlCentralLoginPage(driver); }
 
-    @After
+    // invoked by testWatcher.finished(), after any failure diagnostics have been captured
     public void teardown() throws Exception {
         // clear any stale alers
         dismissAlertIfPresent();
