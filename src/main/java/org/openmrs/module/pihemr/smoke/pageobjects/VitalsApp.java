@@ -1,18 +1,19 @@
 package org.openmrs.module.pihemr.smoke.pageobjects;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
+
+// vitals.xml (v3.0, HAI-1217) is a standard, single-page form--not a one-question-per-screen simple form
 public class VitalsApp extends AbstractPageObject {
 
 	public static final String SEARCH_PATIENT_FIELD_ID = "patient-search";
 
 	private static final By CONFIRM_PATIENT_BUTTON = By.className("icon-arrow-right");
-	private static final By HEIGHT_INCHES_FIELD = By.id("height_inches");
-	private static final By WEIGHT_INCHES_FIELD = By.id("weight_lbs");
-    private static final By LOCATION_FIELD = By.cssSelector("#encounterLocation select");
+	private static final By SUBMIT_BUTTON = By.cssSelector("#buttons input.submitButton");
 
 	public VitalsApp(WebDriver driver) {
 		super(driver);
@@ -27,71 +28,40 @@ public class VitalsApp extends AbstractPageObject {
 	}
 
 	public void enterVitals() {
-	    hitEnterOnLocationField();
-        hitEnterOnInchesField();
-        setClearTextToFieldThruSpan("height_cm", "15");
-        hitEnterOnLbsField();
-		setClearTextToFieldThruSpan("weight_kg", "50");
-		hitEnterOnBMI();
-        hitEnterOnFahrenheitField();
-		setClearTextToFieldThruSpan("temperature_c", "36");
-		setClearTextToFieldThruSpan("heart_rate", "50");
-		setClearTextToFieldThruSpan("respiratory_rate", "50");
-		setClearTextToFieldThruSpan("bp_systolic", "120");
-		setClearTextToFieldThruSpan("bp_diastolic", "80");
-		setClearTextToFieldThruSpan("o2_sat", "50");
-        setClearTextToFieldThruSpan("chief_complaint", "headache");
-		driver.findElement(By.id("confirmationQuestion")).findElement(By.className("confirm")).click();
+		enterBasicVitals();
+		setObsValue("chief_complaint", "headache");
+		submit();
 	}
 
 	public void enterVitalsForInfant() {
-        hitEnterOnLocationField();
-		hitEnterOnInchesField();
-		setClearTextToFieldThruSpan("height_cm", "15");
-		hitEnterOnLbsField();
-		setClearTextToFieldThruSpan("weight_kg", "50");
-		hitEnterOnFahrenheitField();
-		setClearTextToFieldThruSpan("temperature_c", "36");
-		setClearTextToFieldThruSpan("heart_rate", "50");
-		setClearTextToFieldThruSpan("respiratory_rate", "50");
-		setClearTextToFieldThruSpan("bp_systolic", "120");
-		setClearTextToFieldThruSpan("bp_diastolic", "80");
-		setClearTextToFieldThruSpan("o2_sat", "50");
-		hitEnterOnCmField();
-		setClearTextToFieldThruSpan("muac_mm", "100");
-		setClearTextToFieldThruSpan("head_cm", "100");
-		hitEnterOnCalculatedRatio();
-		setClearTextToFieldThruSpan("chief_complaint", "headache");
-		driver.findElement(By.id("confirmationQuestion")).findElement(By.className("confirm")).click();
+		enterBasicVitals();
+		setObsValue("muac_mm", "100");
+		setObsValue("head_cm", "100");
+		setObsValue("chief_complaint", "headache");
+		submit();
 	}
 
-	private void hitEnterOnBMI() {
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		jse.executeScript("document.getElementById('hidden-calculated-bmi').setAttribute('type', 'text');");
-		driver.findElement(By.id("hidden-calculated-bmi")).sendKeys(Keys.RETURN);
+	private void enterBasicVitals() {
+		wait15seconds.until(visibilityOfElementLocated(By.id("height_cm")));
+		setObsValue("height_cm", "15");
+		setObsValue("weight_kg", "50");
+		setObsValue("temperature_c", "36");
+		setObsValue("heart_rate", "50");
+		setObsValue("respiratory_rate", "50");
+		setObsValue("bp_systolic", "120");
+		setObsValue("bp_diastolic", "80");
+		setObsValue("o2_sat", "50");
 	}
 
-	private void hitEnterOnCalculatedRatio() {
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		jse.executeScript("document.getElementById('hidden-calculated-ratio').setAttribute('type', 'text');");
-		driver.findElement(By.id("hidden-calculated-ratio")).sendKeys(Keys.RETURN);
+	// tab (rather than enter) out of the field to fire its change handlers without triggering a form submit
+	private void setObsValue(String obsId, String value) {
+		WebElement field = driver.findElement(By.id(obsId)).findElement(By.cssSelector("input, textarea"));
+		field.clear();
+		field.sendKeys(value);
+		field.sendKeys(Keys.TAB);
 	}
 
-    private void hitEnterOnFahrenheitField() {
-        driver.findElement(By.id("temperature_f")).sendKeys(Keys.RETURN);
-    }
-
-    private void hitEnterOnLbsField() {
-        setTextToField(WEIGHT_INCHES_FIELD, "");
-    }
-
-    private void hitEnterOnInchesField() {
-        driver.findElement(HEIGHT_INCHES_FIELD).sendKeys(Keys.RETURN);
-    }
-
-    private void hitEnterOnCmField() { driver.findElement(By.id("muac_cm")).sendKeys(Keys.RETURN); }
-
-    private void hitEnterOnLocationField() {
-        driver.findElement(LOCATION_FIELD).sendKeys(Keys.RETURN);
-    }
+	private void submit() {
+		clickOn(SUBMIT_BUTTON);
+	}
 }
