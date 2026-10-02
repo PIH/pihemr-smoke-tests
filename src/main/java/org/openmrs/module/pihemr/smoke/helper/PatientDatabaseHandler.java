@@ -221,7 +221,11 @@ public class PatientDatabaseHandler extends BaseDatabaseHandler {
 		for (Map<String, String> tables : getPatientTablesToDelete(connection)) {
 			QueryDataSet createdData = new QueryDataSet(connection);
 			for (String table : tables.keySet()) {
-				createdData.addTable(table, String.format(tables.get(table), patient.getId()));
+				// Not every distro has every table (e.g. obs_reference_range is added in OpenMRS 2.7.0,
+				// emr_radiology_order is dropped by radiologyapp 2.0.0)
+				if (hasTable(table)) {
+					createdData.addTable(table, String.format(tables.get(table), patient.getId()));
+				}
 			}
 			DELETE.execute(connection, createdData);
 		}
@@ -233,8 +237,7 @@ public class PatientDatabaseHandler extends BaseDatabaseHandler {
 		if (patientTablesToDelete == null) {
 			patientTablesToDelete = new LinkedList<>();
 
-			// obs_reference_range is added in OpenMRS 2.7.0
-			if (hasTable("obs_reference_range")) {
+			{
 				Map<String, String> m = new LinkedHashMap<>();
 				m.put("obs_reference_range", "select * from obs_reference_range where obs_id in (select obs_id from obs where person_id = %d)");
 				patientTablesToDelete.add(m);
@@ -261,6 +264,7 @@ public class PatientDatabaseHandler extends BaseDatabaseHandler {
 				m.put("orders", "select * from orders where patient_id = %d");
 				m.put("allergy", "select * from allergy where patient_id = %d");
 				m.put("test_order", "select * from test_order where order_id in (select order_id from orders where patient_id = %d)");
+				m.put("order_attribute", "select * from order_attribute where order_id in (select order_id from orders where patient_id = %d)");
 				m.put("emr_radiology_order", "select * from emr_radiology_order where order_id in (select order_id from orders where patient_id = %d)");
 				m.put("obs", "select * from obs where encounter_id in (select encounter_id from encounter where patient_id = %d)");
 				m.put("encounter_provider", "select * from encounter_provider where encounter_id in (select encounter_id from encounter where patient_id = %d)");
