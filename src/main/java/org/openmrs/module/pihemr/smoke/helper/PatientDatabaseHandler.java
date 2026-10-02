@@ -261,7 +261,6 @@ public class PatientDatabaseHandler extends BaseDatabaseHandler {
 				m.put("orders", "select * from orders where patient_id = %d");
 				m.put("allergy", "select * from allergy where patient_id = %d");
 				m.put("test_order", "select * from test_order where order_id in (select order_id from orders where patient_id = %d)");
-				m.put("emr_radiology_order", "select * from emr_radiology_order where order_id in (select order_id from orders where patient_id = %d)");
 				m.put("obs", "select * from obs where encounter_id in (select encounter_id from encounter where patient_id = %d)");
 				m.put("encounter_provider", "select * from encounter_provider where encounter_id in (select encounter_id from encounter where patient_id = %d)");
 				m.put("person_name", "select * from person_name where person_id = %d");
