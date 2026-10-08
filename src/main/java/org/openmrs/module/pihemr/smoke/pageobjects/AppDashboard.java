@@ -22,6 +22,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.math.BigInteger;
 
@@ -206,7 +207,11 @@ public class AppDashboard extends AbstractPageObject {
 
     public void openApp(String appIdentifier) {
         new HeaderPage(driver).home();
-        clickOn(By.id(appIdentifier));
+        WebElement appLink = wait30seconds.until(ExpectedConditions.elementToBeClickable(By.id(appIdentifier)));
+        clickOn(appLink);
+        // wait for navigation away from the home page, which has its own #patient-search field that
+        // would otherwise intercept input intended for the app page
+        wait30seconds.until(ExpectedConditions.stalenessOf(appLink));
     }
 
     private boolean isAppButtonPresent(String appId) {
