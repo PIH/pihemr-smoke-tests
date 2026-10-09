@@ -5,16 +5,19 @@ PIH-EMR Smoke Tests
 The smoke tests can be run the same way regular tests are run, either through your IDE (in IntelliJ select a test 
 class and then click on the Run or Debug icon) or Maven ("mvn run install" to build the module and run the tests).
 
-These are the test suites available. Each suite expects to be run against a server that is using a
-particular configuration repo and PIH Config.
+These are the test suites available. Each runs in GitHub Actions on every build of its distribution: the
+repo's `smoke-tests.yml` workflow calls
+[`execute-pihemr-smoke-tests.yml`](https://github.com/PIH/openmrs-contrib-distro-tools/blob/main/.github/workflows/execute-pihemr-smoke-tests.yml)
+in openmrs-contrib-distro-tools, which starts a temporary instance from the distribution's image and seed image
+with the PIH Config below and runs the suite against it.
 
-| Suite                                                             | Config Repo                                                    | PIH Config                                  |
-|-------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------|
-| [zlCentral](https://bamboo.pih-emr.org/browse/MIREBALAIS-STHC)    | [zl](https://github.com/PIH/openmrs-config-zl)                 | mirebalais,mirebalais-humci                 |
-| [haiti](https://bamboo.pih-emr.org/browse/MIREBALAIS-STC)         | [zl](https://github.com/PIH/openmrs-config-zl)                 | haiti,haiti-thomonde,haiti-thomonde-ci      |
-| [liberia](https://bamboo.pih-emr.org/browse/MIREBALAIS-STP)       | [pihliberia](https://github.com/PIH/openmrs-config-pihliberia) | liberia,liberia-harper,liberia-harper-kouka |
-| [sierraleone](https://bamboo.pih-emr.org/browse/MIREBALAIS-STP)   | [pihsl](https://github.com/PIH/openmrs-config-pihsl)           | sierraLeone,sierraLeone-wellbody,sierraLeone-wellbody-gladi |
-| [mexico](https://bamboo.pih-emr.org/browse/MIREBALAIS-STM)        | [ces](https://github.com/PIH/openmrs-config-ces)               | *not written yet*                           |
+| Suite         | Run by                                                                                               | PIH Config                                         |
+|---------------|------------------------------------------------------------------------------------------------------|----------------------------------------------------|
+| `zlCentral`   | [zl-emr](https://github.com/PIH/zl-emr/blob/master/.github/workflows/smoke-tests.yml)                 | `haiti,haiti-central,haiti-local-idgen`            |
+| `haiti`       | not run by any workflow                                                                              |                                                    |
+| `liberia`     | [pihliberia-emr](https://github.com/PIH/pihliberia-emr/blob/master/.github/workflows/smoke-tests.yml) | `liberia,liberia-harper,liberia-harper-kouka`      |
+| `sierraleone` | [pihsl-emr](https://github.com/PIH/pihsl-emr/blob/master/.github/workflows/smoke-tests.yml)           | `sierraLeone,sierraLeone-kgh,sierraLeone-kgh-test` |
+| `mexico`      | [ces-emr](https://github.com/PIH/ces-emr/blob/master/.github/workflows/smoke-tests.yml)               | `mexico,mexico-ces-ci`                             |
 
 # Setup
 
