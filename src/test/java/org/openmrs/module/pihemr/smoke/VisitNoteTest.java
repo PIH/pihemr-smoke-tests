@@ -11,6 +11,7 @@ import org.openmrs.module.pihemr.smoke.pageobjects.VisitNote;
 import org.openmrs.module.pihemr.smoke.pageobjects.VitalsApp;
 import org.openmrs.module.pihemr.smoke.pageobjects.forms.BaseHtmlForm;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 import static org.apache.commons.lang.StringUtils.replaceChars;
 import static org.hamcrest.CoreMatchers.is;
@@ -325,7 +326,7 @@ public class VisitNoteTest extends DbTest {
 
     }
 
-    protected LoginPage getLoginPage() { return new ZlCentralLoginPage(driver); }
+    protected LoginPage getLoginPage(WebDriver driver) { return new ZlCentralLoginPage(driver); }
 
     // who checks the patient in; defaults to the same login used for the rest of the flow
     protected void checkInLogin() throws Exception {
