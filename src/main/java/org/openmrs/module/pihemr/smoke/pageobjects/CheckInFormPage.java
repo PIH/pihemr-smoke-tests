@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.openqa.selenium.Keys.RETURN;
-import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOfElementLocated;
 
 public class CheckInFormPage extends AbstractPageObject {
 
@@ -43,7 +42,6 @@ public class CheckInFormPage extends AbstractPageObject {
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
         clickConfirm();
-        wait2minutes.until(invisibilityOfElementLocated(By.className("submitButton")));  // make sure the submit is complete
     }
 
     public void enterInfoWithMultipleEnterKeystrokesOnSubmit()  {
@@ -69,7 +67,7 @@ public class CheckInFormPage extends AbstractPageObject {
             // expected once the submission succeeds and the page navigates away
         }
 
-        wait2minutes.until(invisibilityOfElementLocated(By.className("submitButton")));  // make sure the submit is complete
+        waitForSubmissionToComplete(confirmButton);
     }
 
 	public void enterInfoFillingTheFormTwice() throws Exception {
@@ -85,7 +83,6 @@ public class CheckInFormPage extends AbstractPageObject {
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
 		clickConfirm();
-        wait15seconds.until(invisibilityOfElementLocated(By.className("submitButton")));  // make sure the submit is complete
 	}
 
 	private void findPatient(String patientIdentifier) throws Exception {
@@ -97,10 +94,20 @@ public class CheckInFormPage extends AbstractPageObject {
 	}
 
 	private void clickConfirm() {
-        clickUntil(driver.findElement(By.cssSelector("#confirmationQuestion .confirm")),
+        WebElement confirmButton = driver.findElement(By.cssSelector("#confirmationQuestion .confirm"));
+        clickUntil(confirmButton,
                 ExpectedConditions.visibilityOfElementLocated(By.className("icon-spinner")),
                 15);
+        waitForSubmissionToComplete(confirmButton);
 	}
+
+    // the form posts and the browser keeps the form page until the server responds, so the confirm button only goes
+    // stale once the check-in has been saved; waiting for the "submitButton" class to be invisible doesn't work here,
+    // since the first match is the form's own hidden submit input, and logging out before the response arrives
+    // invalidates the session the submission is still being processed in (so no check-in, and no visit, is saved)
+    private void waitForSubmissionToComplete(WebElement confirmButton) {
+        wait2minutes.until(ExpectedConditions.stalenessOf(confirmButton));
+    }
 
     private void confirmDataForScheduleAppointment() {
         clickOn(By.cssSelector("#confirmationQuestion .confirm"));

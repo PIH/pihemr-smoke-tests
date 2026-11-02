@@ -177,13 +177,26 @@ public class VisitNote extends AbstractPageObject {
 
         if (!encounters.isEmpty()) {
             for (WebElement encounter : encounters) {
-                if (encounter.getText().equals(encounterName))
+                if (encounterNameWithoutTags(encounter).equals(encounterName))
                     count++;
             }
         }
 
 		return count;
 	}
+
+    // the encounter heading also shows a "no data entered" tag next to the name of an encounter without obs or orders
+    // (e.g. a multi-section encounter whose sections haven't been filled in yet); getText() only includes it when visible
+    private String encounterNameWithoutTags(WebElement encounter) {
+        String name = encounter.getText();
+        for (WebElement tag : encounter.findElements(By.className("no-data-tag"))) {
+            String tagText = tag.getText();
+            if (!tagText.isEmpty()) {
+                name = name.replace(tagText, "");
+            }
+        }
+        return name.trim();
+    }
 
 	public void addConsultNoteWithDischarge(String primaryDiagnosis) throws Exception {
 		openForm(formList.get("Consult Note"));
