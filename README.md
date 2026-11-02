@@ -60,7 +60,28 @@ DATABASE_USERNAME=root
 DATABASE_PASSWORD=Admin123
 ```
 
-Where the database name, `<server_name>`, is the SDK server name.
+Where the database name, `<server_name>`, is the SDK server name. The root password may differ from `Admin123`;
+it is the `connection.password` in `~/openmrs/<server_name>/openmrs-server.properties`.
+
+#### MySQL 8 limitations
+
+The tests use MySQL Connector/J 5.1, which has trouble with newer MySQL containers:
+
+* Add `?useSSL=false` to `DATABASE_URL`. Otherwise the connection fails with
+  `SSLHandshakeException: Received fatal alert: protocol_version`.
+* The driver cannot log in as a user that authenticates with `caching_sha2_password`, the default on MySQL 8
+  (`Unable to load authentication plugin 'caching_sha2_password'`). Use MySQL 5.7, or a MySQL 8 user that
+  authenticates with `mysql_native_password` (on MySQL 8.4, start the server with `--mysql-native-password=ON`).
+
+Both failures surface as a `NullPointerException` in `UserDatabaseHandler.setAdminDefaultLocale`, so check the
+test log for the underlying error.
+
+#### Test patients and two-factor authentication
+
+Test patients are created through the REST API, logging in as "admin" with basic authentication. If the server's
+authentication scheme requires a second factor for admin (such as the secret question described under
+[Additional setup](#additional-setup)), these requests fail with `401 Unauthorized` and every test that needs a
+test patient fails with `unable to create patient via API`.
 
 ## Additional setup
 
