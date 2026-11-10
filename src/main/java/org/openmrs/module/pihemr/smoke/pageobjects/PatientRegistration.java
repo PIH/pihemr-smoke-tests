@@ -4,13 +4,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.module.pihemr.smoke.dataModel.Patient;
 import org.openmrs.module.pihemr.smoke.helper.SmokeTestProperties;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -261,6 +265,35 @@ public class PatientRegistration extends AbstractPageObject {
         for (Map.Entry<String, String> nameAndValue : namesToValues) {
             setTextToField(By.name(nameAndValue.getKey()), nameAndValue.getValue());
         }
+        passPossibleDuplicatesQuestion();
+    }
+
+    private static final By DUPLICATES_BUTTON = By.id("duplicates-none");
+
+    /**
+     * The "Possible duplicates" question (registrationapp's possibleDuplicates field, added by pihcore after the phone
+     * number when showDuplicatePatientSection is on) blocks the form until its button is clicked: Enter on the question is
+     * swallowed, and the button does nothing while the check is still running. The button reads "Continue" with no
+     * matches, or "None of these ... continue registration" with matches; either way clicking it moves on. Keep clicking
+     * until the question is left, which also covers a check that is still running or failed (where the click retries it).
+     */
+    public void passPossibleDuplicatesQuestion() {
+        if (driver.findElements(DUPLICATES_BUTTON).isEmpty()) {
+            return;  // the app does not use the duplicate check
+        }
+        wait15seconds.until(visibilityOfElementLocated(DUPLICATES_BUTTON));
+        new WebDriverWait(driver, 30)
+                .pollingEvery(Duration.ofSeconds(1))
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(d -> {
+            List<WebElement> buttons = d.findElements(DUPLICATES_BUTTON);
+            if (buttons.isEmpty() || !buttons.get(0).isDisplayed()) {
+                return true;
+            }
+            buttons.get(0).click();
+            return false;
+        });
     }
 
     public void enterBirthplaceViaShortcut(String searchValue) throws Exception {
