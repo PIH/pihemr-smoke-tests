@@ -212,9 +212,24 @@ public class PatientRegistration extends AbstractPageObject {
             wait5seconds.until(visibilityOfElementLocated(By.className("address-hierarchy-shortcut")));
         }
 
-        WebElement searchBox = driver.findElements(By.className("address-hierarchy-shortcut")).get(index);
-        searchBox.sendKeys(searchValue);
-        wait5seconds.until(visibilityOfElementLocated(By.partialLinkText(searchValue)));
+        // The widget can still be initializing when the box becomes visible (seen when editing an existing address), and
+        // the typed text is then lost, so no suggestion ever shows. If none shows, clear the box and type again.
+        WebElement searchBox = null;
+        int maxAttempts = 3;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            searchBox = driver.findElements(By.className("address-hierarchy-shortcut")).get(index);
+            searchBox.clear();
+            searchBox.sendKeys(searchValue);
+            try {
+                wait5seconds.until(visibilityOfElementLocated(By.partialLinkText(searchValue)));
+                break;
+            }
+            catch (TimeoutException e) {
+                if (attempt == maxAttempts) {
+                    throw e;
+                }
+            }
+        }
         searchBox.sendKeys(Keys.ENTER);
 
         // Some forms have additional address fields that need to be filled out or skipped
