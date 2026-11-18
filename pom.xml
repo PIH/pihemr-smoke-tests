@@ -28,7 +28,7 @@
     </scm>
 
     <properties>
-        <pihcoreVersion>2.0.0-SNAPSHOT</pihcoreVersion>
+        <pihcoreVersion>2.2.0-SNAPSHOT</pihcoreVersion>
         <suite>General</suite>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
