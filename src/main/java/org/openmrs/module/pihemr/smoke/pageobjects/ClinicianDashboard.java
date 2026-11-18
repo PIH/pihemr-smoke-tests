@@ -1,6 +1,5 @@
 package org.openmrs.module.pihemr.smoke.pageobjects;
 
-import org.openmrs.module.pihcore.apploader.CustomAppLoaderConstants;
 import org.openmrs.module.pihemr.smoke.dataModel.Patient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -26,8 +25,6 @@ public class ClinicianDashboard extends AbstractPageObject {
     private static final By retroStopDate = By.cssSelector("#retrospectiveVisitStopDate-display");
 
     private static final By confirmRetroVisit = By.cssSelector("#retrospective-visit-creation-dialog .confirm");
-
-    private static final By deathCertificate = By.id(CustomAppLoaderConstants.Extensions.DEATH_CERTIFICATE_OVERALL_ACTION);
 
     private static final By visitDetails = By.id("visit-details");
 
@@ -103,11 +100,6 @@ public class ClinicianDashboard extends AbstractPageObject {
         hitTabKey(retroStartDate);
         hitTabKey(retroStopDate);
         clickOn(confirmRetroVisit);
-    }
-
-    public DeathCertificateFormPage goToEnterDeathCertificateForm() {
-        clickOn(deathCertificate);
-        return new DeathCertificateFormPage(driver);
     }
 
 
