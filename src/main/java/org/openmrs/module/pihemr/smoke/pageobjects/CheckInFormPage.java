@@ -20,6 +20,7 @@ public class CheckInFormPage extends AbstractPageObject {
 	private static final String CONFIRM_TEXT = "Konfime";
 	private static final String DETAILS_TEXT = "Detay";
 	private static final String TYPE_OF_VISIT_TEXT = "Tip de Vizit";
+	private static final String PAYMENT_AMOUNT_TEXT = "Kantite";
 
     public static final By SEARCH_FIELD = By.id("patient-search");
 
@@ -37,7 +38,7 @@ public class CheckInFormPage extends AbstractPageObject {
         //clickOn(By.cssSelector(".section-container > :last-child"));
         //hitEnterKey();
         tabThroughDetailsToTypeOfVisit();
-        selectThirdOptionFor("typeOfVisit");
+        selectTypeOfVisit(2);
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
@@ -46,7 +47,7 @@ public class CheckInFormPage extends AbstractPageObject {
 
     public void enterInfoWithMultipleEnterKeystrokesOnSubmit()  {
         tabThroughDetailsToTypeOfVisit();
-        selectThirdOptionFor("typeOfVisit");
+        selectTypeOfVisit(2);
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
@@ -72,13 +73,13 @@ public class CheckInFormPage extends AbstractPageObject {
 
 	public void enterInfoFillingTheFormTwice() throws Exception {
         tabThroughDetailsToTypeOfVisit();
-        selectThirdOptionFor("typeOfVisit");
+        selectTypeOfVisit(2);
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
         clickOnNoButton();
         tabThroughDetailsToTypeOfVisit();
-        selectSecondOptionFor("typeOfVisit");
+        selectTypeOfVisit(1);
         findInputInsideSpan("paymentAmount").sendKeys("100" + Keys.RETURN);
         findInputInsideSpan("receiptNumber").sendKeys("receipt #" + Keys.RETURN);
         selectNotToPrintWristbandIfQuestionPresent();
@@ -145,6 +146,28 @@ public class CheckInFormPage extends AbstractPageObject {
 		clickOnDetailsTab();
 		clickOnTypeOfVisitTab();
 	}
+
+    // checkin.xml (multi-select) has a checkbox per type of visit; checkin_v3.5.xml has a dropdown
+    private void selectTypeOfVisit(int option) {
+        List<WebElement> checkboxes;
+        try {
+            driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            checkboxes = driver.findElements(By.cssSelector("#type-of-visit-question input[type=checkbox]"));
+        }
+        finally {
+            driver.manage().timeouts().implicitlyWait(SmokeTestProperties.IMPLICIT_WAIT_TIME, SECONDS);
+        }
+        if (checkboxes.isEmpty()) {
+            selectOptionFor("typeOfVisit", option);
+        }
+        else {
+            WebElement checkbox = checkboxes.get(option);
+            if (!checkbox.isSelected()) {
+                clickOn(checkbox);
+            }
+            clickOnBreadcrumbTab(PAYMENT_AMOUNT_TEXT);
+        }
+    }
 
     // TODO: revert https://github.com/PIH/mirebalais-smoke-tests/commit/e9ab41b02f4c263362b3627cd9e9b3cde951bd4f
     // TODO: after this chrome bug is fixed: https://code.google.com/p/chromium/issues/detail?id=513768
