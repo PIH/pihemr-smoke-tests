@@ -60,7 +60,7 @@ public class UserAdminTest extends BasicSmokeTest {
 
         turnOffImplicitWaits(); // once we've found one element, assume that all are present
         try {
-            assertThat(appDashboard.isUhmCaptureVitalsAppPresented(), is(true));
+            assertThat(appDashboard.isVitalsSearchAppPresented(), is(true));
             assertThat(appDashboard.isAwaitingAdmissionAppPresented(), is(true));
             assertThat(appDashboard.isInpatientsAppPresented(), is(true));
 
@@ -99,7 +99,7 @@ public class UserAdminTest extends BasicSmokeTest {
             assertThat(appDashboard.isSchedulingAppPresented(), is(false)); // appointment scheduling functionality was removed (a02ba0b)
 
             assertThat(appDashboard.isStartClinicVisitAppPresented(), is(false));
-            assertThat(appDashboard.isUhmCaptureVitalsAppPresented(), is(false));
+            assertThat(appDashboard.isVitalsSearchAppPresented(), is(false));
             assertThat(appDashboard.isSystemAdministrationAppPresented(), is(false));
             assertThat(appDashboard.isLegacyAppPresented(), is(false));
         } finally {
@@ -127,7 +127,7 @@ public class UserAdminTest extends BasicSmokeTest {
             assertThat(appDashboard.isReportsAppPresented(), is(true));
 
             assertThat(appDashboard.isSchedulingAppPresented(), is(false));
-            assertThat(appDashboard.isUhmCaptureVitalsAppPresented(), is(false));
+            assertThat(appDashboard.isVitalsSearchAppPresented(), is(false));
             assertThat(appDashboard.isActiveVisitsAppPresented(), is(false));
             assertThat(appDashboard.isSystemAdministrationAppPresented(), is(false));
             assertThat(appDashboard.isLegacyAppPresented(), is(false));
@@ -161,7 +161,7 @@ public class UserAdminTest extends BasicSmokeTest {
             assertThat(appDashboard.isInpatientsAppPresented(), is(true));
             assertThat(appDashboard.isPatientRegistrationAppPresented(), is(true));
             assertThat(appDashboard.isStartClinicVisitAppPresented(), is(true));
-            assertThat(appDashboard.isUhmCaptureVitalsAppPresented(), is(true));
+            assertThat(appDashboard.isVitalsSearchAppPresented(), is(true));
 
             assertThat(appDashboard.isLegacyAppPresented(), is(false));
         } finally {

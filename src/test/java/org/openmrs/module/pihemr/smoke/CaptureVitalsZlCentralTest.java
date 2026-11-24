@@ -13,7 +13,7 @@ public class CaptureVitalsZlCentralTest extends CaptureVitalsTest {
 
 	@Override
 	protected String getVitalsAppIdentifier() {
-		return replaceChars(CustomAppLoaderConstants.Apps.UHM_VITALS, ".", "-") + AppDashboard.APP_LINK_SUFFIX;
+		return replaceChars(CustomAppLoaderConstants.Apps.VITALS_SEARCH, ".", "-") + AppDashboard.APP_LINK_SUFFIX;
 	}
 
 	@Override
