@@ -109,8 +109,8 @@ public class AppDashboard extends AbstractPageObject {
 		return isAppButtonPresent(replaceChars(CustomAppLoaderConstants.Apps.ACTIVE_VISITS_LIST, ".", "-") + APP_LINK_SUFFIX);
 	}
 
-	public boolean isUhmCaptureVitalsAppPresented() {
-		return isAppButtonPresent(replaceChars(CustomAppLoaderConstants.Apps.UHM_VITALS, ".", "-") + APP_LINK_SUFFIX);
+	public boolean isVitalsSearchAppPresented() {
+		return isAppButtonPresent(replaceChars(CustomAppLoaderConstants.Apps.VITALS_SEARCH, ".", "-") + APP_LINK_SUFFIX);
 	}
 
 	public boolean isReportsAppPresented() {
